@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
+
+<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/alokasi.css') }}">
+
 <head>
     <meta charset="UTF-8">
     <title>SpendNote</title>
@@ -39,8 +43,9 @@
     <nav class="navbar-custom d-flex justify-content-between align-items-center">
 
         <div class="d-flex align-items-center gap-2">
-            <img class="logo" src="https://i.imgur.com/XJFU6Gd.png" alt="SpendNote">
+            <img class="logo" src="{{ asset('assets/logo.png') }}" alt="SpendNote">
         </div>
+
 
         <div class="d-flex align-items-center gap-4">
             <span class="notif-icon">🔔</span>

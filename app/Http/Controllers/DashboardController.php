@@ -7,34 +7,45 @@ use App\Models\Alokasi;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $userId = auth()->id();
+        $bulan  = $request->bulan; // dari dropdown filter
 
-        // Hitung saldo
-        $pemasukan = Alokasi::where('user_id', $userId)
-                            ->where('tipe', 'pemasukan')
-                            ->sum('jumlah');
+        // === BASE QUERY ===
+        $alokasiQuery = Alokasi::where('user_id', $userId);
 
-        $pengeluaran = Alokasi::where('user_id', $userId)
-                            ->where('tipe', 'pengeluaran')
-                            ->sum('jumlah');
+        // === FILTER BULAN ===
+        if ($bulan) {
+            $alokasiQuery->whereMonth('created_at', $bulan);
+        }
 
+        // === PEMASUKAN ===
+        $pemasukan = (clone $alokasiQuery)
+                        ->where('tipe', 'pemasukan')
+                        ->sum('jumlah');
+
+        // === PENGELUARAN ===
+        $pengeluaran = (clone $alokasiQuery)
+                        ->where('tipe', 'pengeluaran')
+                        ->sum('jumlah');
+
+        // === SALDO ===
         $saldo = $pemasukan - $pengeluaran;
 
-        // Ambil 5 data terbaru
-        $alokasi_terbaru = Alokasi::where('user_id', $userId)
-                                    ->latest()
-                                    ->take(5)
-                                    ->get();
+        // === 5 ALOKASI TERBARU ===
+        $alokasi_terbaru = (clone $alokasiQuery)
+                            ->latest()
+                            ->limit(5)
+                            ->get();
 
-        // Data grafik bulanan
-        $bulan = [];
+        // === DATA GRAFIK (tidak dipengaruhi filter, tetap 12 bulan) ===
+        $bulan_arr = [];
         $grafik_pemasukan = [];
         $grafik_pengeluaran = [];
 
         for ($i = 1; $i <= 12; $i++) {
-            $bulan[] = date("F", mktime(0,0,0,$i,10));
+            $bulan_arr[] = date("F", mktime(0,0,0,$i,1));
 
             $grafik_pemasukan[] = Alokasi::where('user_id', $userId)
                 ->where('tipe', 'pemasukan')
@@ -47,7 +58,7 @@ class DashboardController extends Controller
                 ->sum('jumlah');
         }
 
-        // Donut kategori
+        // === DONUT ===
         $kategori = Alokasi::where('user_id', $userId)
                             ->groupBy('nama_alokasi')
                             ->pluck('nama_alokasi');
@@ -57,15 +68,14 @@ class DashboardController extends Controller
                             ->groupBy('nama_alokasi')
                             ->pluck('total');
 
-        // PENTING: arahkan ke home.blade.php
         return view('dashboard.home', [
             'data' => [
-                'saldo' => $saldo,
                 'pemasukan' => $pemasukan,
                 'pengeluaran' => $pengeluaran,
+                'saldo' => $saldo,
             ],
             'alokasi_terbaru' => $alokasi_terbaru,
-            'bulan' => $bulan,
+            'bulan' => $bulan_arr,
             'grafik_pemasukan' => $grafik_pemasukan,
             'grafik_pengeluaran' => $grafik_pengeluaran,
             'kategori' => $kategori,

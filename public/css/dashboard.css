@@ -1,0 +1,42 @@
+.dashboard-wrapper {
+    padding-bottom: 50px;
+}
+
+.dashboard-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+}
+
+.card-custom {
+    background: white;
+    padding: 22px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.07);
+    margin-bottom: 20px;
+}
+
+.card-custom p {
+    color: #666;
+    font-size: 14px;
+}
+
+.card-custom h2 {
+    font-weight: 600;
+    color: #222;
+}
+
+.green-shadow { border-left: 5px solid #4CAF50; }
+.blue-shadow { border-left: 5px solid #5A9BF6; }
+.red-shadow { border-left: 5px solid #FF6B6B; }
+
+.btn-primary-custom {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #5A9BF6;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+}

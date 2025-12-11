@@ -19,11 +19,18 @@ class AlokasiController extends Controller
     {
         $userId = Auth::id();
 
+        // Ambil salary bulan ini
+        $salary = Alokasi::where('user_id', $userId)
+            ->where('nama_alokasi', 'Gaji')
+            ->where('tipe', 'pemasukan')
+            ->orderBy('tanggal', 'desc')
+            ->value('jumlah') ?? 0;
+
         // semua plan
         $plans = PembagianPlan::where('user_id', $userId)->get();
 
         // transaksi terbaru
-        $transaksis = Alokasi::where('user_id', $userId)
+        $transactions = Alokasi::where('user_id', $userId)
             ->orderBy('tanggal','desc')
             ->orderBy('id','desc')
             ->take(100)
@@ -42,8 +49,11 @@ class AlokasiController extends Controller
 
         $totalDanaDarurat = DanaDarurat::where('user_id', $userId)->sum('jumlah');
 
-        return view('alokasi', compact('plans','transaksis','alokasi_terbaru','dana','totalDanaDarurat'));
+        return view('alokasi/index', compact(
+            'salary','plans','transactions','alokasi_terbaru','dana','totalDanaDarurat'
+        ));
     }
+
 
     /**
      * Simpan plan pembagian gaji.

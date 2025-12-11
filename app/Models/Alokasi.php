@@ -12,7 +12,6 @@ class Alokasi extends Model
     protected $fillable = [
         'user_id',
         'nama_alokasi',
-        'subkategori',
         'tipe',
         'jumlah',
         'tanggal',
