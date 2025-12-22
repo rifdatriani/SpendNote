@@ -40,3 +40,19 @@
     border-radius: 10px;
     text-decoration: none;
 }
+
+/* =========================
+   DONUT CHART (DISTRIBUSI)
+========================= */
+
+/* Pembungkus agar ukuran tidak kebesaran */
+.donut-wrapper {
+    max-width: 320px;   /* 🔹 KECILKAN DI SINI (300–360 aman) */
+    margin: 0 auto;     /* 🔹 Tengah */
+}
+
+/* Canvas donut */
+#chartDonut {
+    width: 100% !important;
+    height: auto !important;
+}

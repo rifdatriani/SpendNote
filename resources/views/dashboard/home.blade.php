@@ -1,6 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+$warnaBulan = [
+    '#2E7D32', // Jan
+    '#388E3C', // Feb
+    '#43A047', // Mar
+    '#558B2F', // Apr
+    '#6D4C41', // Mei
+    '#00897B', // Jun
+    '#1565C0', // Jul
+    '#283593', // Agu
+    '#4527A0', // Sep
+    '#6A1B9A', // Okt
+    '#AD1457', // Nov
+    '#C62828', // Des
+];
+@endphp
 
 <div class="container dashboard-wrapper">
 
@@ -33,8 +49,12 @@
 
     {{-- BUTTON ALOKASI PENDAPATAN --}}
     <div class="mt-3">
-        <a href="{{ route('alokasi.index') }}" class="btn btn-primary" style="border-radius: 8px; padding: 8px 18px;">
+        <!-- <a href="{{ route('alokasi.index') }}" class="btn btn-primary" style="border-radius: 8px; padding: 8px 18px;">
             Alokasi Pendapatan
+        </a> -->
+    
+        <a href="{{ route('catatan.index') }}" class="btn btn-primary" style="border-radius: 8px; padding: 8px 18px;">
+            Catatan Pengeluaran
         </a>
     </div>
 
@@ -86,25 +106,130 @@
             <div class="card-custom">
                 <h5>5 Transaksi Terbaru</h5>
 
-                @foreach ($alokasi_terbaru as $a)
+                @foreach ($catatan_terbaru as $c)
                 <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>{{ $a->nama_alokasi }}</span>
-                    <span class="text-primary">Rp {{ number_format($a->jumlah,0,',','.') }}</span>
+                    <span>
+                        {{ $c->kategori }}
+                        @if($c->subkategori)/ {{ $c->subkategori }} @endif
+                    </span>
+
+                    <span class="{{ $c->tipe == 'pemasukan' ? 'text-success' : 'text-danger' }}">
+                        {{ $c->tipe == 'pemasukan' ? '+' : '-' }}
+                        Rp {{ number_format($c->nominal,0,',','.') }}
+                    </span>
                 </div>
                 @endforeach
 
-                <a href="{{ route('alokasi.index') }}" class="btn-primary-custom mt-3">Lihat Semua</a>
+                <a href="{{ route('catatan.index') }}" class="btn-primary-custom mt-3">Lihat Semua</a>
             </div>
         </div>
-
     </div>
 
     {{-- DONUT --}}
+    {{-- DONUT --}}
     <div class="card-custom mt-4">
         <h5>Distribusi Pengeluaran</h5>
-        <canvas id="chartDonut"></canvas>
-    </div>
 
+        <div class="donut-wrapper">
+            <canvas id="chartDonut"></canvas>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const labels = @json($labels);
+const pemasukan = @json($grafik_pemasukan);
+const pengeluaran = @json($grafik_pengeluaran);
+
+const isBulanan = {{ $bulan ? 'true' : 'false' }};
+const warnaBulan = @json($warnaBulan);
+
+// Warna garis
+const warnaPemasukan = isBulanan
+    ? '#2E7D32'   // hijau solid
+    : warnaBulan.map(w => w);
+
+const warnaPengeluaran = isBulanan
+    ? '#ff0000ff'   // merah solid
+    : warnaBulan.map(w => w.replace('#', '#FF')); // tone merah beda tiap bulan
+
+new Chart(document.getElementById('chartTren'), {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Pemasukan',
+                data: pemasukan,
+                borderColor: warnaPemasukan,
+                backgroundColor: 'transparent',
+                tension: 0.4
+            },
+            {
+                label: 'Pengeluaran',
+                data: pengeluaran,
+                borderColor: warnaPengeluaran,
+                backgroundColor: 'transparent',
+                tension: 0.4
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' }
+        },
+        scales: {
+            y: {
+                ticks: {
+                    callback: value => 'Rp ' + value.toLocaleString('id-ID')
+                }
+            }
+        }
+    }
+});
+</script>
+
+<script>
+/* =========================
+   DATA DARI CONTROLLER
+========================= */
+const donutLabels = @json($donut_labels); // kategori
+const donutData = @json($donut_data);     // total nominal
+
+/* =========================
+   CHART DONUT
+========================= */
+new Chart(document.getElementById('chartDonut'), {
+    type: 'doughnut',
+    data: {
+        labels: donutLabels,
+        datasets: [{
+            data: donutData,
+            backgroundColor: [
+                '#EF5350', '#66BB6A', '#42A5F5',
+                '#FFA726', '#AB47BC', '#26A69A'
+            ]
+        }]
+    },
+    options: {
+        plugins: {
+            legend: { position: 'right' },
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        let total = donutData.reduce((a,b)=>a+b,0);
+                        let persen = ((ctx.raw / total) * 100).toFixed(1);
+                        return `${ctx.label}: Rp ${ctx.raw.toLocaleString('id-ID')} (${persen}%)`;
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+
 
 @endsection

@@ -17,7 +17,7 @@
             border-bottom: 1px solid #eee;
         }
         .navbar-custom img.logo {
-            height: 35px;
+            height: 50px;
         }
         .profile-icon {
             width: 35px;
@@ -43,7 +43,9 @@
     <nav class="navbar-custom d-flex justify-content-between align-items-center">
 
         <div class="d-flex align-items-center gap-2">
-            <img class="logo" src="{{ asset('assets/logo.png') }}" alt="SpendNote">
+            <a href="{{ route('dashboard') }}">
+                <img class="logo" src="{{ asset('assets/logo.png') }}" alt="SpendNote">
+            </a>
         </div>
 
 

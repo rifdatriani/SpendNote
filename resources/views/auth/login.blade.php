@@ -19,6 +19,22 @@
     <div class="auth-right">
         <h2>Masuk ke SpendNote</h2>
 
+        {{-- ======================
+            NOTIF LOGIN
+        ====================== --}}
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+
         <form method="POST" action="{{ route('login.submit') }}">
             @csrf
             <input type="email" name="email" placeholder="Email" required>
@@ -34,4 +50,11 @@
 </div>
 
 </body>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(el => el.remove());
+    }, 4000);
+</script>
+
 </html>

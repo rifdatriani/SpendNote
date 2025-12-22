@@ -19,6 +19,18 @@
     <div class="auth-right">
         <h2>Buat Akun Baru</h2>
 
+        {{-- ======================
+            NOTIF REGISTER
+        ====================== --}}
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                @foreach ($errors->all() as $error)
+                    <div>{{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
+
+
         <form method="POST" action="{{ route('register.submit') }}">
             @csrf
 
@@ -38,4 +50,11 @@
 </div>
 
 </body>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(el => el.remove());
+    }, 4000);
+</script>
+
 </html>

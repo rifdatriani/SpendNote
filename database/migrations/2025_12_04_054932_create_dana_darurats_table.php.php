@@ -11,15 +11,19 @@ return new class extends Migration
         Schema::create('dana_darurats', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('bulan');
-            $table->integer('minggu')->default(1);
-            $table->string('status')->default('Pemasukan'); // atau Pengeluaran
-            $table->string('sumber')->nullable();
-            $table->bigInteger('jumlah')->default(0);
-            $table->bigInteger('total')->default(0); // akumulasi per user
+
+            // yang kamu butuhkan
+            $table->date('tanggal');      // tanggal transaksi
+            $table->string('status');     // pemasukan / pengeluaran
+            $table->bigInteger('nominal'); // jumlah transaksi
+            $table->bigInteger('total');   // total akumulasi per transaksi (opsional)
+
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
         });
     }
 

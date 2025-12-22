@@ -13,11 +13,9 @@ class DanaDarurat extends Model
 
     protected $fillable = [
         'user_id',
-        'bulan',
-        'minggu',
+        'tanggal',
+        'nominal',
         'status',
-        'sumber',
-        'jumlah',
         'total',
     ];
 }

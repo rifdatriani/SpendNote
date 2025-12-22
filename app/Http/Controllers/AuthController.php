@@ -8,57 +8,69 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    // ======================
     // LOGIN
+    // ======================
     public function showLogin()
-{
-    if (auth()->check()) {
-        return redirect()->route('dashboard'); // HARUS ke dashboard
-    }
+    {
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        }
 
-    return view('auth.login');
-}
+        return view('auth.login');
+    }
 
     public function login(Request $request)
     {
+        // ✅ VALIDASI
         $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
-            return redirect('/dashboard');
+        // ❌ EMAIL TIDAK TERDAFTAR
+        if (!User::where('email', $request->email)->exists()) {
+            return back()->with('error', 'Email belum terdaftar.');
         }
 
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ]);
+        // ❌ PASSWORD SALAH
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return back()->with('error', 'Password yang kamu masukkan salah.');
+        }
+
+        // ✅ LOGIN BERHASIL
+        return redirect()->route('dashboard')
+            ->with('success', 'Login berhasil. Selamat datang!');
     }
 
-
+    // ======================
     // REGISTER
-     public function showRegister()
+    // ======================
+    public function showRegister()
     {
         return view('auth.register');
     }
 
     public function register(Request $request)
     {
+        // ✅ VALIDASI REGISTER
         $request->validate([
             'name'     => 'required',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6'
+        ], [
+            'email.unique' => 'Email sudah terdaftar.',
+            'password.min' => 'Password minimal 6 karakter.'
         ]);
 
         User::create([
-            'name'  => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => bcrypt($request->password)
         ]);
 
-        // JANGAN login otomatis → hindari redirect loop & error guest
-        // Auth::attempt($request->only('email', 'password'));
-
-        // Redirect ke login + pesan sukses
-        return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan login.');
+        // ✅ REGISTER BERHASIL
+        return redirect()->route('login')
+            ->with('success', 'Akun berhasil dibuat! Silakan login.');
     }
 }
